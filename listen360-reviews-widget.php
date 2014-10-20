@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: Listen360 Reviews Widget
-Plugin URI: http://developers.listen360.com/wordpress-widget.html
+Plugin URI: http://developers.listen360.com/public-reviews-wordpress-widget.html
 Description: Adds a shortcode [listen360_reviews] that inserts your company's Listen360 reviews in pages or posts.
 Author: Listen360
 Version: 0.1
@@ -93,7 +93,7 @@ echo "<h2>" . __( 'Listen360 Reviews Settings', 'menu-test' ) . "</h2>";
   <?php _e("To use the widget, simply insert the shortcode <code>[listen360_reviews]</code> on any page or post where you wish your reviews to appear.  You can reference any location's reviews by specifying an identifier in the shortcode: <code>[listen360_reviews identifier=your-location-identifier]</code>."); ?>
 </p>
 <p>
-  <?php _e("For more information on the widget, please visit <a href=\"http://developers.listen360.com/wordpress-widget.html\" target=\"blank\">the documentation</a>."); ?>
+  <?php _e("For more information on the widget, please visit <a href=\"http://developers.listen360.com/public-reviews-wordpress-widget.html\" target=\"blank\">the documentation</a>."); ?>
 </p>
 
 <hr />
