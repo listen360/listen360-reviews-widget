@@ -41,9 +41,13 @@ function listen360_reviews_shortcode( $atts ) {
 
   $url = listen360_reviews_url( $identifier );
 
-  echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://reviews.listen360.com/assets/listen360.css\" />\n";
-  readfile($url . "aggregaterating");
-  readfile($url . "stream?per_page=" . $atts['per_page']);
+  $response = get_headers($url . "stream", 1);
+  
+  if ( preg_match('/200/', $response[0]) > 0 ) {
+    echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://reviews.listen360.com/assets/listen360.css\" />\n";
+    readfile($url . "aggregaterating");
+    readfile($url . "stream?per_page=" . $atts['per_page']);
+  }
 }
 
 add_shortcode('listen360_reviews', 'listen360_reviews_shortcode');
