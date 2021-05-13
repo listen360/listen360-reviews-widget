@@ -5,7 +5,7 @@ Plugin Name: Listen360 Reviews Widget
 Plugin URI: http://developers.listen360.com/public-reviews-wordpress-widget.html
 Description: Adds a shortcode [listen360_reviews] that inserts your company's Listen360 reviews in pages or posts.
 Author: Listen360
-Version: 0.1
+Version: 0.2
 Author URI: http://www.listen360.com
 License: GPLv2
 */
@@ -121,7 +121,7 @@ echo "<h2>" . __('Listen360 Reviews Settings', 'menu-test') . "</h2>";
 
 /*
 Listen360 Reviews Widget
-Copyright (C) 2014 by Listen360
+Copyright (C) 2021 by Listen360
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
