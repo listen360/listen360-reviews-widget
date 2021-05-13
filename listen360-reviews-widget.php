@@ -12,82 +12,88 @@ License: GPLv2
 
 add_option('listen360_reviews_location_url', '');
 
-function listen360_reviews_url( $identifier ) {
-  if ( $identifier == "" ) {
+function listen360_reviews_url($identifier) {
+  if ($identifier == "") {
     $identifier = get_option('listen360_reviews_location_url');
   }
 
   $str = "https://reviews.listen360.com/" . $identifier;
 
-  if ( substr($str, -1) != '/' ) {
+  if (substr($str, -1) != '/') {
     $str .= "/";
   }
 
   return $str;
 }
 
-
-function listen360_reviews_shortcode( $atts ) {
-  $atts = shortcode_atts( array(
+function listen360_reviews_shortcode($atts) {
+  $atts = shortcode_atts(array(
     'per_page' => '10',
     'identifier' => ""
-  ), $atts );
+  ), $atts);
 
   $identifier = "";
 
-  if ( $atts['identifier'] != "" ) {
+  if ($atts['identifier'] != "") {
     $identifier = $atts['identifier'];
   }
 
-  $url = listen360_reviews_url( $identifier );
+  $url = listen360_reviews_url($identifier );
 
   $response = get_headers($url . "stream", 1);
-  
-  if ( preg_match('/200/', $response[0]) > 0 ) {
-    echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://reviews.listen360.com/assets/listen360.css\" />\n";
-    readfile($url . "aggregaterating");
-    readfile($url . "stream?per_page=" . $atts['per_page']);
+
+  if (preg_match('/200/', $response[0]) > 0) {
+    $output = "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://reviews.listen360.com/assets/listen360.css\" />\n";
+    $output .= file_get_contents($url . "aggregaterating");
+    $output .= file_get_contents($url . "stream?per_page=" . $atts['per_page']);
+  } else {
+    $output = '';
   }
+
+  return $output;
 }
 
-add_shortcode('listen360_reviews', 'listen360_reviews_shortcode');
+function listen360_init() {
+  add_shortcode('listen360_reviews', 'listen360_reviews_shortcode');
+}
 
-add_action( 'admin_menu', 'listen360_reviews_menu' );
+add_action('admin_menu', 'listen360_reviews_menu');
 
+add_action('init', 'listen360_init');
 
 function listen360_reviews_menu() {
-  add_options_page( 'Listen360 Reviews Options', 'Listen360', 'manage_options', 'listen360-reviews-widget', 'listen360_reviews_plugin_options' );
+  add_options_page('Listen360 Reviews Options', 'Listen360', 'manage_options', 'listen360-reviews-widget', 'listen360_reviews_plugin_options');
 }
 
 function listen360_reviews_plugin_options() {
-  if ( !current_user_can( 'manage_options' ) )  {
-    wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+  if (!current_user_can('manage_options'))  {
+    wp_die(__('You do not have sufficient permissions to access this page.'));
   }
 
-  $opt_val = get_option( 'listen360_reviews_location_url' );
+  $opt_val = get_option('listen360_reviews_location_url');
 
-  if( isset($_POST[ 'listen360_reviews_form_submitted' ]) && $_POST[ 'listen360_reviews_form_submitted' ] == 'Y' ) {
+  if(isset($_POST[ 'listen360_reviews_form_submitted' ]) && $_POST[ 'listen360_reviews_form_submitted' ] == 'Y') {
       // Read their posted value
       $opt_val = $_POST[ 'listen360_reviews_location_identifier' ];
 
       // Save the posted value in the database
-      update_option( 'listen360_reviews_location_url', $opt_val );
+      update_option('listen360_reviews_location_url', $opt_val);
 
 ?>
-<div class="updated"><p><strong><?php _e('Listen360 Reviews settings saved.', 'menu-test' ); ?></strong></p></div>
+<div class="updated"><p><strong><?php _e('Listen360 Reviews settings saved.', 'menu-test'); ?></strong></p></div>
 <?php
 
   }
 
 echo '<div class="wrap">';
-echo "<h2>" . __( 'Listen360 Reviews Settings', 'menu-test' ) . "</h2>";
+echo "<h2>" . __('Listen360 Reviews Settings', 'menu-test') . "</h2>";
 
 ?>
 
 <form name="listen360_reviews_options_form" method="post" action="">
 <input type="hidden" name="listen360_reviews_form_submitted" value="Y">
 
-<p><?php _e("Location Identifier:&nbsp;&nbsp;", 'menu-test' ); ?>
+<p><?php _e("Location Identifier:&nbsp;&nbsp;", 'menu-test'); ?>
 <input type="text" name="listen360_reviews_location_identifier" value="<?php echo $opt_val; ?>" size="40">
 </p>
 <p>
@@ -112,7 +118,6 @@ echo "<h2>" . __( 'Listen360 Reviews Settings', 'menu-test' ) . "</h2>";
 <?php
 
 }
-
 
 /*
 Listen360 Reviews Widget
