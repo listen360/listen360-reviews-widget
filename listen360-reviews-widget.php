@@ -11,6 +11,7 @@ License: GPLv2
 */
 
 add_option('listen360_reviews_location_url', '');
+add_option('listen360_reviews_include_stylesheet', true);
 
 function listen360_reviews_url($identifier) {
   if ($identifier == "") {
@@ -42,12 +43,13 @@ function listen360_reviews_shortcode($atts) {
 
   $response = get_headers($url . "stream", 1);
 
+  $output = '';
   if (preg_match('/200/', $response[0]) > 0) {
-    $output = "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://reviews.listen360.com/assets/listen360.css\" />\n";
+    if(get_option('listen360_reviews_include_stylesheet')) {
+      $output .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://reviews.listen360.com/assets/listen360.css\" />\n";
+    }
     $output .= file_get_contents($url . "aggregaterating");
     $output .= file_get_contents($url . "stream?per_page=" . $atts['per_page']);
-  } else {
-    $output = '';
   }
 
   return $output;
@@ -70,14 +72,17 @@ function listen360_reviews_plugin_options() {
     wp_die(__('You do not have sufficient permissions to access this page.'));
   }
 
-  $opt_val = get_option('listen360_reviews_location_url');
+  $listen360_reviews_location_url_val       = get_option('listen360_reviews_location_url');
+  $listen360_reviews_include_stylesheet_val = get_option('listen360_reviews_include_stylesheet');
 
-  if(isset($_POST[ 'listen360_reviews_form_submitted' ]) && $_POST[ 'listen360_reviews_form_submitted' ] == 'Y') {
-      // Read their posted value
-      $opt_val = $_POST[ 'listen360_reviews_location_identifier' ];
+  if(isset($_POST['listen360_reviews_form_submitted']) && $_POST['listen360_reviews_form_submitted'] == 'Y') {
+      // Read their posted values
+      $listen360_reviews_location_url_val =       $_POST['listen360_reviews_location_identifier'];
+      $listen360_reviews_include_stylesheet_val = isset($_POST['listen360_reviews_include_stylesheet']);
 
-      // Save the posted value in the database
-      update_option('listen360_reviews_location_url', $opt_val);
+      // Save the posted values in the database
+      update_option('listen360_reviews_location_url',       $listen360_reviews_location_url_val);
+      update_option('listen360_reviews_include_stylesheet', $listen360_reviews_include_stylesheet_val);
 
 ?>
 <div class="updated"><p><strong><?php _e('Listen360 Reviews settings saved.', 'menu-test'); ?></strong></p></div>
@@ -94,10 +99,16 @@ echo "<h2>" . __('Listen360 Reviews Settings', 'menu-test') . "</h2>";
 <input type="hidden" name="listen360_reviews_form_submitted" value="Y">
 
 <p><?php _e("Location Identifier:&nbsp;&nbsp;", 'menu-test'); ?>
-<input type="text" name="listen360_reviews_location_identifier" value="<?php echo $opt_val; ?>" size="40">
+<input type="text" name="listen360_reviews_location_identifier" value="<?php echo $listen360_reviews_location_url_val; ?>" size="40" />
 </p>
 <p>
-  <?php _e("This is the identifier at the end of your Listen360 Reviews page url.  For example:&nbsp;&nbsp;<strong>https://reviews.listen360.com/your-identifier-here</strong>."); ?>
+  <?php _e("&nbsp;&nbsp;This is the identifier at the end of your Listen360 Reviews page url.  For example:&nbsp;&nbsp;<strong>https://reviews.listen360.com/your-identifier-here</strong>."); ?>
+</p>
+<p><?php _e("Include Stylesheets:&nbsp;&nbsp;", 'menu-test'); ?>
+<input type="checkbox" name="listen360_reviews_include_stylesheet" <?php if($listen360_reviews_include_stylesheet_val) { echo "checked"; } ?> />
+</p>
+<p>
+  <?php _e("&nbsp;&nbsp;Uncheck this setting if you do not want to include the default Listen360 stylesheets.  In this case, you will want to make sure you setup the styles on your site correctly."); ?>
 </p>
 <p>
   <?php _e("To use the widget, simply insert the shortcode <code>[listen360_reviews]</code> on any page or post where you wish your reviews to appear.  You can reference any location's reviews by specifying an identifier in the shortcode: <code>[listen360_reviews identifier=your-location-identifier]</code>."); ?>
